@@ -54,19 +54,8 @@ app.whenReady().then(() => {
     }
   });
 
-  // Убираем стандартное меню
   win.removeMenu();
-
-  // Загружаем ваш сайт
   win.loadURL('https://hawk.live');
-
-  // Временно уберите скроллинг при `did-finish-load`
-  // win.webContents.on('did-finish-load', () => {
-  // if (!sessionStorage.getItem('scrolled')) {
-  //   window.scrollTo(0, 500); // Закомментируйте для тестирования
-  //   sessionStorage.setItem('scrolled', 'true');  
-  // }
-  // });
 
   // Включаем DevTools по нажатию F12 и перезагрузку по F5
   win.webContents.on('before-input-event', (event, input) => {

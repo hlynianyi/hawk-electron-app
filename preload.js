@@ -60,43 +60,6 @@ window.addEventListener('DOMContentLoaded', () => {
   // Начинаем отслеживание изменений в body
   observer.observe(document.body, { childList: true, subtree: true });
 
-  // Ожидание кнопки выбора карты и её нажатие
-  function waitForButtonAndClick() { // 3
-    let mapButton = document.getElementById('match-view-series-menu');
-    if (mapButton) {
-      setTimeout(() => {
-        mapButton.click();
-        console.log("Кнопка 'Select a Map' нажата");
-      }, 100);
-    } else {
-      console.log("Кнопка не найдена, пробуем снова...");
-      setTimeout(waitForButtonAndClick, 100);
-    }
-  }
-
-  // Функция для выбора карты по клавишам 1, 2, 3 и т.д.
-  function selectMap(mapIndex) {
-    return new Promise((resolve, reject) => {
-      const mapListItems = document.querySelectorAll('.v-list-item-title');
-      console.log(mapListItems);
-
-      if (mapListItems && mapListItems[mapIndex]) {
-        setTimeout(() => {
-          mapListItems[mapIndex].click();
-          console.log(`Выбрана карта ${mapIndex + 1}`);
-          resolve(); // Успешно выбираем карту
-        }, 100);
-      } else {
-        console.log(`Карта ${mapIndex + 1} не найдена.`);
-        let mapButton = document.getElementById('match-view-series-menu');
-        mapButton.click();
-        showNotification(`Карта ${mapIndex + 1} не найдена.`); // Показываем уведомление
-        reject("Карта не найдена");
-      }
-    });
-  }
-
-  // Функция для отображения уведомления
   function showNotification(message) {
     // Создаем элемент уведомления
     const notify = document.createElement('div');
@@ -121,33 +84,39 @@ window.addEventListener('DOMContentLoaded', () => {
     }, 3000);
   }
 
+  // Функция для выбора карты по клавишам 1, 2, 3 и т.д.
+  function selectMap(keyPressed) {
+    console.log('inside selectMap keyPressed:', keyPressed)
+    const mapIndex = keyPressed - 1;
+    
+    return new Promise((resolve, reject) => {
+      const mapListItems = document.querySelectorAll('.v-list-item-title');
+      console.log(mapListItems);
 
-  // Автоскролл при выборе карты
-  function autoScrollAfterMapSelect() {
-    const observer = new MutationObserver(() => {
-      if (window.location.href.includes("map2")) {
-        console.log("Карта 2 выбрана, выполняем автоскролл...");
-        window.scrollTo({
-          top: 429,
-          behavior: 'smooth'
-        });
-        observer.disconnect();
+      if (mapListItems && mapListItems[mapIndex]) {
+        setTimeout(() => {
+          mapListItems[mapIndex].click();
+          console.log(`Выбрана карта ${mapIndex}`);
+          resolve(); // Успешно выбираем карту
+        }, 250);
+      } else {
+        console.log(`Карта ${keyPressed} не найдена.`);
+        let mapButton = document.getElementById('match-view-series-menu');
+        mapButton.click();
+        showNotification(`Карта ${keyPressed} не найдена.`); // Показываем уведомление
+        reject("Карта не найдена");
       }
     });
-    observer.observe(document.body, { childList: true, subtree: true });
   }
+
+
 
   // Обработка клавиш "R", "Q" и выбора карты
   document.addEventListener('keydown', function(event) {
     let mapButton = document.getElementById('match-view-series-menu');
 
     if (event.key === 'r' || event.key === 'R' || event.key === 'к' || event.key === 'К') {
-      performScroll(); // Используем новую функцию performScroll
-    }
-    if (event.key === 'q' || event.key === 'Q' || event.key === 'й' || event.key === 'Й') {
-      sessionStorage.setItem('refreshAndClick', 'true'); // 1
-      sessionStorage.setItem('scrollPosition', window.scrollY);
-      location.reload();
+      performScroll();
     }
 
     // Переключение пресетов на Z (я) и X (ч)
@@ -160,103 +129,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
     }
 
-    if (event.key === '1') {
-      Promise.resolve()
-        .then(() => {
-          mapButton.click();
-          return new Promise(resolve => setTimeout(resolve, 200));
-        })
-        .then(() => {
-          selectMap(0)
-          return new Promise(resolve => setTimeout(resolve, 400))
-        })
-        .then(() => {
-          return performScroll();
-        })
-        .then(() => {
-          console.log("Проверка позиции скролла:", window.scrollY); // Проверка позиции
-        })
-        .catch(err => {
-          console.error("Ошибка при выполнении последовательности:", err);
-        });
-    } else if (event.key === '2') {
-      Promise.resolve()
-        .then(() => {
-          mapButton.click();
-          return new Promise(resolve => setTimeout(resolve, 200));
-        })
-        .then(() => {
-          selectMap(1)
-          return new Promise(resolve => setTimeout(resolve, 400))
-        })
-        .then(() => {
-          return performScroll();
-        })
-        .then(() => {
-          console.log("Проверка позиции скролла:", window.scrollY); // Проверка позиции
-        })
-        .catch(err => {
-          console.error("Ошибка при выполнении последовательности:", err);
-        });
-      } else if (event.key === '3') {
-        Promise.resolve()
-          .then(() => {
-            mapButton.click();
-            return new Promise(resolve => setTimeout(resolve, 200));
-          })
-          .then(() => {
-            selectMap(2)
-            return new Promise(resolve => setTimeout(resolve, 400))
-          })
-          .then(() => {
-            return performScroll();
-          })
-          .then(() => {
-            console.log("Проверка позиции скролла:", window.scrollY); // Проверка позиции
-          })
-          .catch(err => {
-            console.error("Ошибка при выполнении последовательности:", err);
-          });
-        } else if (event.key === '4') {
-          Promise.resolve()
-            .then(() => {
-              mapButton.click();
-              return new Promise(resolve => setTimeout(resolve, 200));
-            })
-            .then(() => {
-              selectMap(3)
-              return new Promise(resolve => setTimeout(resolve, 400))
-            })
-            .then(() => {
-              return performScroll();
-            })
-            .then(() => {
-              console.log("Проверка позиции скролла:", window.scrollY); // Проверка позиции
-            })
-            .catch(err => {
-              console.error("Ошибка при выполнении последовательности:", err);
-            });
-        } else if (event.key === '5') {
-          Promise.resolve()
-            .then(() => {
-              mapButton.click();
-              return new Promise(resolve => setTimeout(resolve, 200));
-            })
-            .then(() => {
-              selectMap(4)
-              return new Promise(resolve => setTimeout(resolve, 400))
-            })
-            .then(() => {
-              return performScroll();
-            })
-            .then(() => {
-              console.log("Проверка позиции скролла:", window.scrollY); // Проверка позиции
-            })
-            .catch(err => {
-              console.error("Ошибка при выполнении последовательности:", err);
-            });
-        }
-
+    if (event.key === '1' || event.key == '2' || event.key == '3' || event.key == '4' || event.key == '5') {
+      console.log(event.key, '- нажата кнопка')
+      sessionStorage.setItem("selectedMap", event.key);
+      this.location.reload();
+    }
   // конец логики прослушивания клавиш
   });
 
@@ -271,16 +148,39 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   window.addEventListener('load', function() {
-  if (sessionStorage.getItem('refreshAndClick') === 'true') {
-    sessionStorage.removeItem('refreshAndClick');
-    waitForButtonAndClick();
-  }
-  checkAudioMutedState();
+    console.log('windows loaded, map chosen:', this.sessionStorage.getItem('selectedMap'))
+
+    let selectedMap;
+    if (this.sessionStorage.getItem('selectedMap')) {
+      selectedMap = this.sessionStorage.getItem('selectedMap');
+      sessionStorage.removeItem('selectedMap');
+      console.log('selectedMap let:', selectedMap)
+      let mapButton = document.getElementById('match-view-series-menu');
+      Promise.resolve()
+        .then(() => {
+          mapButton.click();
+          return new Promise(resolve => setTimeout(resolve, 400));
+        })
+        .then(() => {
+          selectMap(selectedMap)
+          return new Promise(resolve => setTimeout(resolve, 400))
+        })
+        .then(() => {
+          return performScroll();
+        })
+        .then(() => {
+          console.log("Проверка позиции скролла:", window.scrollY);
+        })
+        .catch(err => {
+          console.error("Ошибка при выполнении последовательности:", err);
+        });
+    }
+    checkAudioMutedState();
   });
 
   // Слушаем сообщение от main.js для выполнения автоскролла после изменения пресета
   ipcRenderer.on('perform-scroll', () => {
-    performScroll();  // Выполняем автоскролл после смены пресета
+    performScroll(); 
   });
 
   let isScrolling;
