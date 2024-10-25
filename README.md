@@ -7,7 +7,7 @@
 ### Открыть терминал в месте где будет расположен проект на вашем диске и вписать последовательно команды ниже
 
 ```
-git clone
+git clone https://github.com/hlynianyi/hawk-electron-app.git
 ```
 
 ```
